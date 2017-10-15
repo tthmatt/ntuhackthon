@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Untitled Document</title>
+</head>
+
+<body>
+var images = [];
+
+function removeImage(image) {
+    while((index = images.indexOf(image)) !== -1) {
+        images.splice(index, 1);
+    }
+}
+function decrementImage(image) {
+    var index = images.indexOf(image);
+    images.splice(index, 1);
+}
+
+function countOccurrences(image) {
+    var occurrences = 0;
+    for (i = 0; i < images.length; i++) {
+        if (images[i] === image) occurrences += 1
+    }
+    return occurrences;
+}
+
+$('#image-container').on('click', 'img', function () {
+    var image = $(this),
+        source = image.attr('src');
+        image.data('selected', true).addClass('selected').siblings('.controls').show();
+        images.push(source);
+        image.siblings('span.count').html(countOccurrences(source));
+});
+
+$('#image-container').on('mouseleave', '.image-wrapper', function () {
+    $(this).children('.controls').hide(); 
+});
+
+$('#image-container').on('mouseenter', 'img', function () {
+    var image = $(this),
+        controls = image.siblings('.controls');
+    if (image.data('selected') === true) {
+        controls.show();
+    }
+});
+
+$('#image-container').on('click', '[data-action="remove"]', function () {
+    var controls = $(this).parents('div.controls'),
+        image = controls.siblings('img')
+        source = image.attr('src');
+        image.data('selected', false).removeClass('selected');
+        controls.hide();
+        removeImage(source);
+        image.siblings('span.count').html(countOccurrences(source));
+});
+
+$('#image-container').on('click', '[data-action="increment"]', function () {
+    var image = $(this).parents('.controls').siblings('img'),
+        source = image.attr('src');
+    images.push(source);
+    image.siblings('span.count').html(countOccurrences(source));
+});
+
+$('#image-container').on('click', '[data-action="decrement"]', function () {
+    var image = $(this).parents('.controls').siblings('img'),
+        source = image.attr('src');
+    decrementImage(source);
+    var count = countOccurrences(source)
+    image.siblings('span.count').html(count);
+    if (count < 1) {
+        image.siblings('.controls').hide();
+        image.data('selected', false).removeClass('selected');
+    }
+});
+
+$(document).click(function () {
+    console.log(images);
+});
+<script src="js/photo-picker.js"></script>
+</body>
+</html>
